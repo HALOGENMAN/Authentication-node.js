@@ -54,4 +54,20 @@ router.post("/login",[
 
 router.post("/logout",authController.postLogout)
 
+router.get("/newPassword",authController.getNewPassword)
+
+router.post("/newPassword",[
+    body("email")
+    .isEmail()
+    .withMessage("enter prper email")
+    .custom((val,{req})=>{
+        return User.findOne({email:val})
+        .then(check=>{
+            if(!check){
+                return Promise.reject("Email does not exist")
+            }
+        })
+    })
+],authController.postNewPassword)
+
 module.exports = router;

@@ -1,7 +1,15 @@
 const User  = require("../models/user")
 const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator")
+const nodemailer = require("nodemailer")
 
+const transporter = nodemailer.createTransport({
+    service:"gmail",
+    auth:{
+        user:"Shayak.malakar.159@gmail.com",
+        pass:"159951sm357753",
+    }
+})
 
 exports.getCreateUser = (req,res,next) =>{
     res.render("createUser",{})
@@ -21,7 +29,15 @@ exports.postCreateUser = (req,res,next) => {
         return user.save()
     })
     .then(()=>{
-        res.redirect("/")
+        return transporter.sendMail({
+            from:"Shayak.malakar.159@gmail.com",
+            to:req.body.email,
+            subject:"Accoutnt Created",
+            text:"thanks for using our services"
+        })
+    })
+    .then(()=>{
+        res.redirect("/login")
     })
     .catch(err=>{
         next(err)
@@ -48,13 +64,24 @@ exports.postLogin = (req,res,next)=>{
                     if(err){
                         return next(err)
                     }
-                    res.redirect("/")
+                    return transporter.sendMail({
+                        from:"Shayak.malakar.159@gmail.com",
+                        to:req.body.email,
+                        subject:"Succesfully loggedIn",
+                        text:"thanks for using our services"
+                    })
                 })
             }
             else{
                 return next("password didnot matched")
             }
         })
+        .then(()=>{
+            res.redirect("/")
+        })
+    })
+    .catch(err=>{
+        next(err)
     })
     
 }
@@ -66,4 +93,17 @@ exports.postLogout = (req,res,next)=>{
         }
         res.redirect("/")
     })
+}
+
+exports.getNewPassword = (req,res,next)=>{
+    res.render("newPassword")
+}
+
+exports.postNewPassword = (req,res,next)=>{
+    const error = validationResult(req);
+    if(!error.isEmpty()){
+        return next(error.array())
+    }
+    console.log(req.body.email)
+    res.redirect("/")
 }

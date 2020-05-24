@@ -22,6 +22,7 @@
     "express-session": "^1.17.1",
     "express-validator": "^6.5.0",
     "mangodb": "^1.0.0",
-    "mongoose": "^5.9.15"
+    "mongoose": "^5.9.15",
+    "nodemailer": "^6.4.6"
   }
 }
