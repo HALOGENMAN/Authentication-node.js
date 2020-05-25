@@ -2,6 +2,7 @@ const User  = require("../models/user")
 const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator")
 const nodemailer = require("nodemailer")
+const crypto = require("crypto")
 
 const transporter = nodemailer.createTransport({
     service:"gmail",
@@ -24,7 +25,9 @@ exports.postCreateUser = (req,res,next) => {
     .then(hashPass=>{
         user = new User({
             email:req.body.email,
-            password:hashPass
+            password:hashPass,
+            resetToken :undefined,
+            resetTokenExpiration:undefined
         })
         return user.save()
     })
@@ -104,6 +107,70 @@ exports.postNewPassword = (req,res,next)=>{
     if(!error.isEmpty()){
         return next(error.array())
     }
-    console.log(req.body.email)
-    res.redirect("/")
+    crypto.randomBytes(32,(err,buffer)=>{
+        if(err){
+            return next(err)
+        }
+        const token = buffer.toString("hex")
+        User.findOne({email:req.body.email})
+        .then(user=>{
+            user.resetToken = token,
+            user.resetTokenExpiration = Date.now()  + 3600000;
+            return user.save()
+        })
+        .then(()=>{
+            res.send("<h1>email has been sent Plzz check it and click the link<h1>")
+            return transporter.sendMail({
+                from:"Shayak.malakar.159@gmail.com",
+                to:req.body.email,
+                subject:"Change password",
+                text:`http://localhost:3000/reset/${token}`
+            })
+        })
+        .catch(err=>{
+            next(err)
+        })
+    })
+    
+}
+
+exports.getSaveNewPassword = (req,res,next)=>{
+    const token = req.params.token;
+    const  error = validationResult(req)
+    if(!error.isEmpty()){
+        return next(error.array())
+    }
+    User.findOne({resetToken:token})
+    .then(user=>{
+        res.render("saveNewPassword",{
+            userId:user._id.toString()
+        })
+    })
+    .catch(err=>{
+        next(err)
+    })
+
+}
+
+exports.postSaveNewPassword = (req,res,next)=>{
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        return next(errors.array())
+    }
+    User.findOne({_id:req.body.id})
+    .then(user=>{
+        return bcrypt.hash(req.body.password,12)
+        .then(pass=>{
+            user.password = pass;
+            user.resetToken = undefined;
+            user.resetTokenExpiration = undefined;
+            return user.save()
+        })
+        .then(()=>{
+            res.redirect("/")
+        })
+    })
+    .catch(err=>{
+        next(err)
+    })
 }

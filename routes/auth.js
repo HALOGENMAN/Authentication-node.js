@@ -2,7 +2,7 @@ const express = require("express");
 const authController = require("../controllers/auth");
 const User = require("../models/user");
 const router = express.Router();
-const {body} = require("express-validator");
+const {body,param} = require("express-validator");
 
 router.get("/",authController.getCreateUser)
 router.post("/postCreateUser",[
@@ -68,6 +68,35 @@ router.post("/newPassword",[
             }
         })
     })
+],authController.postNewPassword)
+
+router.get("/reset/:token",[
+    param("token")
+    .custom((val,{req})=>{
+        return User.findOne({resetToken:val,resetTokenExpiration:{ $gt: Date.now()}})
+        .then(check => {
+            if(!check){
+                return Promise.reject("link is not valid")
+            }
+        })
+    })
+],authController.getSaveNewPassword)
+
+router.post("/new-password",[
+    body("id")
+    .custom((val,{req})=>{
+        return User.findOne({_id:val})
+        .then(check=>{
+            if(!check){
+                return Promise.reject("user not exist")
+            }
+        })
+    })
+    ,
+    body("password","length must be greater then 5 char")
+    .isAlphanumeric()
+    .isLength({min:5})
+    .trim()
 ],authController.postNewPassword)
 
 module.exports = router;
