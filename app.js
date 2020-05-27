@@ -5,7 +5,7 @@ const csrf = require("csurf")
 const session = require("express-session"); 
 const mongodbSessionStore = require("connect-mongodb-session")(session)
 
-MONGOOSE_URI = "mongodb+srv://shayak:159951sm357753@cluster0-fidtq.mongodb.net/authProject" ;
+MONGOOSE_URI = "mongodb+srv://shayak:<enter password>@cluster0-fidtq.mongodb.net/authProject" ;
 
 const store = new mongodbSessionStore({
     uri:MONGOOSE_URI,
