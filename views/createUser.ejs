@@ -3,19 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Create user</title>
 </head>
 <body>
-    <h1>Create user</h1>
-    <form action="postCreateUser" method="POST">
-        <input type="email" name="email"><br><br>
-        <input type="password" name="password" ><br><br>
-        <input type="password" name="conformPassword"><br><br>
-
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        
-        <button type="submit">submit</button><br><br>
-    </form>
     <% if (isAuthenticated) {%>
         <h1><%= name.email %></h1>
         <form action="logout" method="POST">
@@ -23,6 +13,16 @@
             <button type="submit">logOut</button>
         </form>
     <%} else {%>
+        <h1>Create user</h1>
+        <form action="postCreateUser" method="POST">
+            <input type="email" name="email"><br><br>
+            <input type="password" name="password" ><br><br>
+            <input type="password" name="conformPassword"><br><br>
+
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        
+            <button type="submit">submit</button><br><br>
+        </form>
         <button><a href="login">login</a></button>
     <%} %>
 </body>
