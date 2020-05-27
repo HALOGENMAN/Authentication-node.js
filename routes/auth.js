@@ -97,6 +97,6 @@ router.post("/new-password",[
     .isAlphanumeric()
     .isLength({min:5})
     .trim()
-],authController.postNewPassword)
+],authController.postSaveNewPassword)
 
 module.exports = router;

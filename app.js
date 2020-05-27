@@ -47,7 +47,7 @@ app.use((err,req,res,next)=>{
 mongoose.connect(MONGOOSE_URI)
 .then(()=>{
     console.log("CONNECTED!")
-    app.listen(3000)
+    app.listen(8080)
 })
 .catch(err=>{
     console.log(err)

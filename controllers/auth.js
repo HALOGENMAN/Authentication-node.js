@@ -114,8 +114,8 @@ exports.postNewPassword = (req,res,next)=>{
         const token = buffer.toString("hex")
         User.findOne({email:req.body.email})
         .then(user=>{
-            user.resetToken = token,
-            user.resetTokenExpiration = Date.now()  + 3600000;
+            user.resetToken = token
+            user.resetTokenExpiration = Date.now()  + 3600000
             return user.save()
         })
         .then(()=>{
@@ -124,7 +124,7 @@ exports.postNewPassword = (req,res,next)=>{
                 from:"Shayak.malakar.159@gmail.com",
                 to:req.body.email,
                 subject:"Change password",
-                text:`http://localhost:3000/reset/${token}`
+                text:`http://localhost:8080/reset/${token}`
             })
         })
         .catch(err=>{
@@ -162,8 +162,8 @@ exports.postSaveNewPassword = (req,res,next)=>{
         return bcrypt.hash(req.body.password,12)
         .then(pass=>{
             user.password = pass;
-            user.resetToken = undefined;
             user.resetTokenExpiration = undefined;
+            user.resetToken = undefined;
             return user.save()
         })
         .then(()=>{
